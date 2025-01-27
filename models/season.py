@@ -12,6 +12,7 @@ class Season(BaseModel):
     title: str
     episodes: Optional[List[Episode]] = None
     show: Show
+    url: Optional[str] = None
 
     @property
     def number(self) -> int:

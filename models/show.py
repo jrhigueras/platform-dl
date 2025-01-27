@@ -10,6 +10,7 @@ class Show(BaseModel):
     id: int | str
     title: str = ''
     seasons: Optional[List[Season]] = None
+    url: Optional[str] = None
 
     def __str__(self):
         return f"{self.id} - {self.title}"
