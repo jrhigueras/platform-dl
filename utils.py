@@ -59,7 +59,7 @@ def select_season(show: Show) -> Season:
     season = input("Select the season: ")
 
     try:
-        return show.seasons[int(season)-1]
+        return show.seasons[int(season)]
     except (ValueError, IndexError):
         exit(0)
 
