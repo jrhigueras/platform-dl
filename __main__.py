@@ -6,25 +6,31 @@ from .utils import select_show, select_season, select_episodes
 
 logging.basicConfig(level=logging.INFO)
 
-args = arguments.init()
-platform = Platform.get_platform(args.platform)(args)
 
-shows = platform.search(args.query)
-if not shows:
-    platform.logger.error("No shows found")
-    exit(1)
-show = select_show(shows)
+def main():
+    args = arguments.init()
+    platform = Platform.get_platform(args.platform)(args)
 
-seasons = platform.get_seasons(show)
-if seasons:
-    season = select_season(show)
-else:
-    season = Season(id=0, title="Unknown", show=show)
+    shows = platform.search(args.query)
+    if not shows:
+        platform.logger.error("No shows found")
+        exit(1)
+    show = select_show(shows)
 
-episodes = platform.get_episodes(show, season)
-if not episodes:
-    platform.logger.error("No episodes found")
-    exit(1)
+    seasons = platform.get_seasons(show)
+    if seasons:
+        season = select_season(show)
+    else:
+        season = Season(id=0, title="Unknown", show=show)
 
-episodes = select_episodes(episodes)
-platform.download(episodes)
+    episodes = platform.get_episodes(show, season)
+    if not episodes:
+        platform.logger.error("No episodes found")
+        exit(1)
+
+    episodes = select_episodes(episodes)
+    platform.download(episodes)
+
+
+if __name__ == "__main__":
+    main()
