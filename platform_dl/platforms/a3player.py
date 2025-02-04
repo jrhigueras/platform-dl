@@ -1,6 +1,6 @@
 from typing import List
 
-from . import Platform, PaidSubscriptionError
+from . import Platform, PaidSubscriptionError, UserRequiredError
 from ..downloaders.ffmpeg import FFMPEG
 from ..models import Show, Season, Episode
 
@@ -29,8 +29,11 @@ class A3Player(Platform[FFMPEG]):
     def _get_download_url(self, video_id: str) -> str | None:
         r = self.session.get(f"{self.base_api_url}/player/v1/episode/{video_id}")  # noqa: E501
         data = r.json()
-        if data.get('error') and data['error'] == 'required_paid':
-            raise PaidSubscriptionError("This episode requires a paid subscription")  # noqa: E501
+        if data.get('error'):
+            if data['error'] == 'required_paid':
+                raise PaidSubscriptionError("This episode requires a paid subscription")  # noqa: E501
+            elif data['error'] == 'required_registered':
+                raise UserRequiredError("This episode requires a registered user")  # noqa: E501
 
         for source in data.get('sources', []):
             if source['type'] == 'application/vnd.apple.mpegurl':
@@ -91,6 +94,9 @@ class A3Player(Platform[FFMPEG]):
                 download_url = self._get_download_url(episode_id)
             except PaidSubscriptionError:
                 self.logger.warning(f"Episode {title} requires a paid subscription")  # noqa: E501
+                continue
+            except UserRequiredError:
+                self.logger.warning(f"Episode {title} requires a registered user")  # noqa: E501
                 continue
             episodes.append(
                 Episode(

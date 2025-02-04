@@ -105,3 +105,7 @@ class Platform(ABC, Generic[T]):
 
 class PaidSubscriptionError(Exception):
     pass
+
+
+class UserRequiredError(Exception):
+    pass
