@@ -223,18 +223,25 @@ class RTVE(Platform[Axel]):
         url += "?size=500"
         r = self.session.get(url)
         data = r.json()
-        episodes = [
-            Episode(
-                id=item['id'],
-                title=item['title'],
-                description=item['description'],
-                url=self._get_download_url(item['id']),
-                number=item['episode'],
-                season=season
-            )
-            for item in data['page']['items']
-            if item and (item.get('type') or {}).get('name') == 'Completo'
-        ]
+        episodes = []
+        i = 0
+        for item in reversed(data['page']['items']):
+            if item['type']['name'] == 'Completo':
+                number = item['episode']
+                if number == 0:
+                    i += 1
+                    number = i
+
+                episodes.append(
+                    Episode(
+                        id=item['id'],
+                        title=item['title'],
+                        description=item['description'],
+                        url=self._get_download_url(item['id']),
+                        number=number,
+                        season=season
+                    )
+                )
         if season:
             season.episodes = episodes
         return episodes
