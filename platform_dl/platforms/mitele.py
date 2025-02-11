@@ -1,5 +1,5 @@
 import urllib.parse
-from typing import List
+from typing import Any, Dict, List
 
 from . import Platform
 from ..downloaders.ytdlp import YTDLP
@@ -37,10 +37,16 @@ class MiTele(Platform[YTDLP]):
             self.logger.error(r.text)
             exit(1)
         data = r.json()
+
+        contents: List[Dict[str, Any]] = []
+
         for tab in data['tabs']:
             if tab['type'] == 'navigation':
-                break
-        else:
+                contents.extend(tab['contents'])
+            else:
+                contents.append(tab)
+
+        if not contents:
             raise ValueError("No navigation tab found")
 
         seasons = [
@@ -50,22 +56,30 @@ class MiTele(Platform[YTDLP]):
                 show=show,
                 url=item['link']['href']
             )
-            for item in tab['contents']
+            for item in contents
         ]
         show.seasons = seasons
         return seasons
 
     def get_episodes(self, show: Show, season: Season) -> List[Episode]:
         assert season.url, "Season URL is required"
+        if isinstance(season.id, str) and '.' not in season.id:
+            season.id = season.id + ".0"
         payload = "/tabs/mtweb?url=https://www.mitele.es" + season.url
-        payload += "&tabId=" + str(show.id) + ".0"
+        payload += "&tabId=" + str(season.id)
         url = self.base_api_url + urllib.parse.quote(payload)
         r = self.session.get(url)
         data = r.json()
+
+        contents = []
+
         for content in data['contents']:
             if content.get('children'):
-                break
-        else:
+                contents.extend(content['children'])
+            else:
+                contents.append(content)
+
+        if not contents:
             raise ValueError("No children found")
 
         episodes = [
@@ -77,7 +91,7 @@ class MiTele(Platform[YTDLP]):
                 number=item['info']['episode_number'],
                 season=season
             )
-            for item in content['children']
+            for item in contents
         ]
 
         if season:

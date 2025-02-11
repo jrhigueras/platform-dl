@@ -16,5 +16,6 @@ class Downloader(ABC):
         return subprocess.run(
             tuple(command),
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.PIPE,
+            check=True
         )

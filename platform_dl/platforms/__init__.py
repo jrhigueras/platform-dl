@@ -69,6 +69,14 @@ class Platform(ABC, Generic[T]):
         self.pool.join()
 
     def download_episode(self, episode: Episode) -> None:
+        def error_callback(x: BaseException) -> None:
+            txt = f"Error downloading {self.get_filename(episode=episode)}: "
+            try:
+                txt += x.stderr.decode()  # type: ignore
+            except AttributeError:
+                txt += str(x)
+            self.logger.error(txt)
+
         if not episode.url:
             self.logger.warning(f"Episode {episode.title} has no URL")
             return
@@ -89,7 +97,7 @@ class Platform(ABC, Generic[T]):
                 'url': episode.url
             },
             callback=lambda x: self.logger.info(f"Downloaded {filename}"),
-            error_callback=lambda x: self.logger.error(f"Error downloading {filename}: {x}")  # noqa: E501
+            error_callback=error_callback
         )
 
     @staticmethod

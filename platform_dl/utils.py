@@ -55,9 +55,15 @@ def select_season(show: Show) -> Season:
     show.seasons.sort(key=lambda x: x.number)
 
     seasons = {}
+    i = 0
     for season in show.seasons:
-        seasons[season.number] = season
-        print(f"{season.number} - {season.title}")
+        if season.number == 0:
+            i += 1
+            number = i
+        else:
+            number = season.number
+        seasons[number] = season
+        print(f"{number} - {season.title}")
 
     season = input("Select the season: ")
 
