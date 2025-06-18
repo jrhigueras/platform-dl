@@ -19,4 +19,4 @@ class Season(BaseModel):
         try:
             return int(''.join(filter(str.isdigit, self.title)))
         except Exception:
-            return 0
+            return 1
