@@ -59,7 +59,7 @@ class Platform(ABC, Generic[T]):
         raise NotImplementedError
 
     def get_filename(self, episode: Episode) -> str:
-        return self.output_file.format(episode=episode, container=self.container)  # noqa: E501
+        return self.output_file.format(episode=episode, container=self.container).replace('/', '-')  # noqa: E501
 
     def download(self, episodes: List[Episode]) -> None:
         for episode in episodes:
