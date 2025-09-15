@@ -11,7 +11,7 @@ def init() -> argparse.Namespace:
         '--platform',
         type=str,
         help="The platform to download from.",
-        required=True
+        required=False
     )
     parser.add_argument(
         'query',

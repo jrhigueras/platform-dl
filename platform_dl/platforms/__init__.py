@@ -25,7 +25,7 @@ class Platform(ABC, Generic[T]):
     exclude_regex: str
 
     def __init__(self, args: Namespace):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = logging.getLogger(str(self))
         self.logger.info("Initializing")
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': self.user_agent})
@@ -41,6 +41,9 @@ class Platform(ABC, Generic[T]):
                     raise SystemExit(1)
             except NotImplementedError:
                 self.logger.warning("Authentication not implemented")
+
+    def __str__(self) -> str:
+        return self.__class__.__name__
 
     @property
     def downloader(self) -> Type[T]:
@@ -117,6 +120,16 @@ class Platform(ABC, Generic[T]):
                     if platform.__name__.lower() == name.lower():
                         return platform
         raise ValueError(f"Platform {name} not found")
+
+    @staticmethod
+    def get_all_platforms() -> List[Type['Platform']]:
+        platforms = []
+        for _, module_name, _ in pkgutil.iter_modules([os.path.dirname(__file__)]):  # noqa: E501
+            module = __import__(f"{__name__}.{module_name}", fromlist=[''])
+            for platform in module.__dict__.values():
+                if isinstance(platform, type) and issubclass(platform, Platform) and platform != Platform:  # noqa: E501
+                    platforms.append(platform)
+        return platforms
 
 
 class PaidSubscriptionError(Exception):
