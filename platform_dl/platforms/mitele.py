@@ -13,9 +13,9 @@ class MiTele(Platform[YTDLP]):
     def _get_download_url(self, video_url: str) -> str:
         return "https://www.mitele.es" + video_url
 
-    def search(self, show_name: str) -> List[Show]:
-        self.logger.info(f"Searching for {show_name}")
-        payload = f"/search/mtweb?url=www.mitele.es&text={show_name}"  # noqa: E501
+    def search(self, name: str) -> List[Show]:
+        self.logger.info(f"Searching for {name}")
+        payload = f"/search/mtweb?url=www.mitele.es&text={name}"  # noqa: E501
         url = self.base_api_url + urllib.parse.quote(payload)
 
         r = self.session.get(url)

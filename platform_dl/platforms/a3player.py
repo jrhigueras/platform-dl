@@ -39,12 +39,12 @@ class A3Player(Platform[FFMPEG]):
             if source['type'] == 'application/vnd.apple.mpegurl':
                 return source['src']
 
-    def search(self, show_name: str) -> List[Show]:
-        self.logger.info(f"Searching for {show_name}")
+    def search(self, name: str) -> List[Show]:
+        self.logger.info(f"Searching for {name}")
         url = f"{self.base_api_url}/client/v1/row/search"
         params = {
             "entityType": "ATPFormat",
-            "text": show_name,
+            "text": name,
             "size": 100,
             "page": 0
         }

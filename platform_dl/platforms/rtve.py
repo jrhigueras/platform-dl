@@ -188,9 +188,9 @@ class RTVE(Platform[Axel]):
         parsed = parsed._replace(netloc='mediavod-lvlt.rtve.es')
         return parsed.geturl()
 
-    def search(self, show_name: str) -> List[Show]:
-        self.logger.info(f"Searching for {show_name}")
-        url = f"{self.base_api_url}/search/programs?search={show_name}&page=1&size=10"  # noqa: E501
+    def search(self, name: str) -> List[Show]:
+        self.logger.info(f"Searching for {name}")
+        url = f"{self.base_api_url}/search/programs?search={name}&page=1&size=10"  # noqa: E501
         r = self.session.get(url)
         return [
             Show(
