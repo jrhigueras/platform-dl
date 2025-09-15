@@ -92,6 +92,7 @@ class MiTele(Platform[YTDLP]):
                 season=season
             )
             for item in contents
+            if not self.is_excluded(item['title'])
         ]
 
         if season:

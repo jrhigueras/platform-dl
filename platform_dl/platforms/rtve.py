@@ -227,6 +227,8 @@ class RTVE(Platform[Axel]):
         i = 0
         for item in reversed(data['page']['items']):
             if item['type']['name'] == 'Completo':
+                if self.is_excluded(item['title']):
+                    continue
                 number = item['episode']
                 if number == 0:
                     i += 1

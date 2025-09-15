@@ -88,6 +88,8 @@ class A3Player(Platform[FFMPEG]):
         for item in data['itemRows']:
             episode_id = item['contentId']
             title = item['title']
+            if self.is_excluded(title):
+                continue
             r2 = self.session.get(f"{self.base_api_url}/client/v1/page/episode/{episode_id}")  # noqa: E501
             data2 = r2.json()
             try:

@@ -1,6 +1,7 @@
 import logging
 import os
 import pkgutil
+import re
 import requests
 from abc import ABC, abstractmethod
 from argparse import Namespace
@@ -21,6 +22,7 @@ class Platform(ABC, Generic[T]):
     output_file = "{episode.season.show.title} - S{episode.season.number:02}E{episode.number:02} - {episode.title}.{container}"  # noqa: E501
     container = "mp4"
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"  # noqa: E501
+    exclude_regex: str
 
     def __init__(self, args: Namespace):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -29,6 +31,7 @@ class Platform(ABC, Generic[T]):
         self.session.headers.update({'User-Agent': self.user_agent})
         self.pool = Pool(processes=args.concurrency)
         self.dry_run = args.dry_run
+        self.exclude_regex = args.exclude if args.exclude else ""
 
         if args.username and args.password:
             try:
@@ -42,6 +45,11 @@ class Platform(ABC, Generic[T]):
     @property
     def downloader(self) -> Type[T]:
         return get_args(self.__orig_bases__[0])[0]  # type: ignore
+
+    def is_excluded(self, title: str) -> bool:
+        if self.exclude_regex:
+            return re.search(self.exclude_regex, title) is not None
+        return False
 
     def authenticate(self, username: str, password: str) -> bool:
         raise NotImplementedError
