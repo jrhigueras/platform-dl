@@ -184,8 +184,8 @@ class RTVE(Platform[Axel]):
         urls = self.get_info_from_image(video_id)
         best = urls[-1]
         parsed = urllib.parse.urlparse(best)
-        parsed = parsed._replace(query='')
-        parsed = parsed._replace(netloc='mediavod-lvlt.rtve.es')
+        # parsed = parsed._replace(query='')
+        parsed = parsed._replace(netloc='rtve-mediavod-lote3.rtve.es')
         return parsed.geturl()
 
     def search(self, name: str) -> List[Show]:
